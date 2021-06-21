@@ -21,9 +21,13 @@ unsigned long lastTime;
 unsigned long currentTime;
 unsigned long timeInterval = 4000;
 int selectedPattern = 3;
-static float size = 2.;
-//SimplexNoise sn;
 int speeder, sizer = 0;
+
+//Global Variable.
+//This is gonna be kludgy but deal with it later.
+
+float gl_size = 2.;
+
 
 #define PI 3.14
 #define SIZEMAX 10
@@ -104,7 +108,7 @@ void loop() {
       drawGrowingCircles(speeder, sizer);
       break;
     case 2:
-      drawWrongLine();
+      drawWrongLine(speeder, sizer);
       break;
     case 3:
 
@@ -156,23 +160,23 @@ void drawNoise(int sp, int sz) {
 }
 
 void drawGrowingCircles(int sp, int sz) {
-  float increment = float(sp)/float(SPEEDMAX);
-  increment = constrain(increment, .1, 1.);
+  float increment = float(sp)/float(SPEEDMAX) * 10.;
+  increment = constrain(increment, 1., 10.);
   for (int i = 1; i <= sz; i += 1) {
-    display.drawCircle(display.width() / 2, display.height() / 2, i * size / 2, SSD1306_WHITE);
+    display.drawCircle(display.width() / 2, display.height() / 2, i * gl_size / 2, SSD1306_WHITE);
 
   }
 
   display.display();
 
-  int smallestSize = sz * size / 2;
+  int smallestSize = gl_size / 2; 
 
-  if (smallestSize > display.width()/2) size = 2.;
-  size += increment;
+  if (smallestSize > display.width()/4) gl_size = 0.; //this is slightly random but oh well so is life
+  gl_size += increment;
 }
 
 void resetGrowingCircles() {
-  size = 0;
+  gl_size = 0.;
 }
 
 void drawStrobes() {
@@ -273,7 +277,7 @@ void drawRotatedSquare(int x, int y, float theta) {
 
 }
 
-void drawWrongLine() {
+void drawWrongLine(int sp, int sz) {
 
   int step = 10;
   float lastx = -999;
