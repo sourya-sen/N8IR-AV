@@ -1607,8 +1607,13 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 </segment>
 <segment>
 <pinref part="TEENSY" gate="G$1" pin="GND"/>
-<wire x1="15.24" y1="25.4" x2="-7.62" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="25.4" x2="7.62" y2="25.4" width="0.1524" layer="91"/>
 <label x="-7.62" y="25.4" size="1.778" layer="95"/>
+<pinref part="TEENSY" gate="G$1" pin="GND1"/>
+<wire x1="7.62" y1="25.4" x2="-7.62" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="15.24" y1="22.86" x2="7.62" y2="22.86" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="22.86" x2="7.62" y2="25.4" width="0.1524" layer="91"/>
+<junction x="7.62" y="25.4"/>
 </segment>
 <segment>
 <pinref part="SCALER" gate="G$1" pin="A"/>
@@ -1712,26 +1717,26 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 </net>
 <net name="ANALOGIN1" class="0">
 <segment>
-<pinref part="TEENSY" gate="G$1" pin="A1/15"/>
-<wire x1="15.24" y1="78.74" x2="2.54" y2="78.74" width="0.1524" layer="91"/>
-<label x="-5.08" y="78.74" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="SPEEDER" gate="G$1" pin="S"/>
 <wire x1="73.66" y1="10.16" x2="73.66" y2="25.4" width="0.1524" layer="91"/>
 <label x="73.66" y="25.4" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="TEENSY" gate="G$1" pin="A0/14"/>
+<wire x1="15.24" y1="81.28" x2="-7.62" y2="81.28" width="0.1524" layer="91"/>
+<label x="-7.62" y="81.28" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="ANALOGIN2" class="0">
-<segment>
-<pinref part="TEENSY" gate="G$1" pin="A2/16"/>
-<wire x1="15.24" y1="76.2" x2="-22.86" y2="76.2" width="0.1524" layer="91"/>
-<label x="-22.86" y="76.2" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="SCALER" gate="G$1" pin="S"/>
 <wire x1="106.68" y1="10.16" x2="106.68" y2="25.4" width="0.1524" layer="91"/>
 <label x="106.68" y="25.4" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="TEENSY" gate="G$1" pin="A1/15"/>
+<wire x1="15.24" y1="78.74" x2="0" y2="78.74" width="0.1524" layer="91"/>
+<label x="0" y="78.74" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="DIN1" class="0">
