@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 unsigned long lastTime;
 unsigned long currentTime;
 unsigned long timeInterval = 4000;
-int selectedPattern = 3;
+int selectedPattern = 3; 
 int speeder, sizer = 0;
 
 //Global Variable.
@@ -39,6 +39,15 @@ struct Vec2f {
 };
 
 Bounce input1 = Bounce(12, 5);
+int patternOffset = 0;
+
+int pinXOOO = 3;
+int pinOXOO = 4;
+int pinOOXO = 5;
+int pinOOOX = 6;
+
+int XOOO, OXOO, OOXO, OOOX = 0;
+int inputPattern = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -66,11 +75,27 @@ void setup() {
   pinMode(14, INPUT);
   pinMode(15, INPUT);
 
+  pinMode(pinXOOO, INPUT);
+  pinMode(pinOXOO, INPUT);
+  pinMode(pinOOXO, INPUT);
+  pinMode(pinOOOX, INPUT);
+
   selectedPattern = 7;
 
 }
 
 void loop() {
+
+  XOOO = digitalRead(pinXOOO);
+  OXOO = digitalRead(pinOXOO);
+  OOXO = digitalRead(pinOOXO);
+  OOOX = digitalRead(pinOOOX);
+
+  int debugOut = 10000 + 1000 * XOOO + 100 * OXOO + 10 * OOXO + OOOX;
+  Serial.println(debugOut);
+
+  inputPattern = bToD(100 * OXOO + 10 * OOXO + OOOX);
+  selectedPattern = (inputPattern + patternOffset) % 5;
 
   int pin14 = analogRead(14);
   sizer = map(pin14, 0, 1023, 1, SIZEMAX);
@@ -78,10 +103,12 @@ void loop() {
   int pin15 = analogRead(15);
   speeder = map(pin15, 0, 1023, 1, SPEEDMAX);
 
+  /*
   Serial.print("Speeder is: ");
   Serial.println(speeder);
   Serial.print("Sizer is: ");
   Serial.println(sizer);
+  */
 
   display.clearDisplay();
   unsigned long currentTime = millis();
@@ -119,7 +146,7 @@ void loop() {
       }
       break;
     case 4:
-      drawSimplexNoise();
+      drawTestFlight();
       break;
     case 5:
       drawStrobes();
@@ -140,8 +167,8 @@ void loop() {
   input1.update();
 
   if (input1.risingEdge()) {
-    selectedPattern++;
-    selectedPattern = selectedPattern % 4;
+    patternOffset++;
+    patternOffset = patternOffset % 7;
     //    Serial.println(selectedPattern);
   }
 
@@ -151,7 +178,7 @@ void drawNoise(int sp, int sz) {
   int randMax = SIZEMAX + 2;
   for (int x = 0; x < display.width(); x++) {
     for (int y = 0; y < display.width(); y++) {
-      int r = random(0, (randMax-sz));
+      int r = random(0, (randMax - sz));
       if (r  == 1) {
         display.drawPixel(x, y, SSD1306_WHITE);
       }
@@ -160,7 +187,7 @@ void drawNoise(int sp, int sz) {
 }
 
 void drawGrowingCircles(int sp, int sz) {
-  float increment = float(sp)/float(SPEEDMAX) * 10.;
+  float increment = float(sp) / float(SPEEDMAX) * 10.;
   increment = constrain(increment, 1., 10.);
   for (int i = 1; i <= sz; i += 1) {
     display.drawCircle(display.width() / 2, display.height() / 2, i * gl_size / 2, SSD1306_WHITE);
@@ -169,9 +196,9 @@ void drawGrowingCircles(int sp, int sz) {
 
   display.display();
 
-  int smallestSize = gl_size / 2; 
+  int smallestSize = gl_size / 2;
 
-  if (smallestSize > display.width()/4) gl_size = 0.; //this is slightly random but oh well so is life
+  if (smallestSize > display.width() / 4) gl_size = 0.; //this is slightly random but oh well so is life
   gl_size += increment;
 }
 
@@ -323,6 +350,15 @@ void drawTestFlight() {
   drawRotationThing(6, 12, millis() / 10., radius);
   drawRotationThing(6, -12, millis() / 10., radius);
   drawRotationThing(-6, -12, millis() / 10., radius);
+}
 
-
+int bToD(unsigned num){
+    unsigned res = 0;
+    
+    for(int i = 0; num > 0; ++i){
+        if((num % 10) == 1) res += (1 << i);
+        num /= 10;
+    }
+    
+    return res;
 }
