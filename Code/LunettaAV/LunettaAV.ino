@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 unsigned long lastTime;
 unsigned long currentTime;
 unsigned long timeInterval = 4000;
-int selectedPattern = 3; 
+int selectedPattern = 3;
 int speeder, sizer = 0;
 
 //Global Variable.
@@ -48,6 +48,7 @@ int pinOOOX = 6;
 
 int XOOO, OXOO, OOXO, OOOX = 0;
 int inputPattern = 0;
+int lastReset = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -62,8 +63,18 @@ void setup() {
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
+  // display.display();
+
+  display.clearDisplay();
+  display.setTextSize(1);             
+  display.setTextColor(SSD1306_WHITE);        
+  display.setCursor(0, 20);           
+  display.println(F("LUNETTA AV SYNTH"));
+  display.println(F("v0.0.1"));
+  display.println(F("Sourya Sen 2021"));
   display.display();
-  delay(1000); // Pause for 2 seconds
+
+  delay(2000); // Pause for 2 seconds
 
   // Clear the buffer
   display.clearDisplay();
@@ -80,7 +91,7 @@ void setup() {
   pinMode(pinOOXO, INPUT);
   pinMode(pinOOOX, INPUT);
 
-  selectedPattern = 7;
+  selectedPattern = random(0, 6);
 
 }
 
@@ -91,11 +102,23 @@ void loop() {
   OOXO = digitalRead(pinOOXO);
   OOOX = digitalRead(pinOOOX);
 
-  int debugOut = 10000 + 1000 * XOOO + 100 * OXOO + 10 * OOXO + OOOX;
-  Serial.println(debugOut);
+  //  int debugOut = 10000 + 1000 * XOOO + 100 * OXOO + 10 * OOXO + OOOX;
+  //  Serial.println(debugOut);
 
   inputPattern = bToD(100 * OXOO + 10 * OOXO + OOOX);
   selectedPattern = (inputPattern + patternOffset) % 5;
+
+  if (lastReset != XOOO) {
+    //RisingEdge
+    if (XOOO == 1) {
+      //doGlobalReset();
+    }
+    //Falling Edge
+    else {
+      //
+    }
+    lastReset = XOOO;
+  }
 
   int pin14 = analogRead(14);
   sizer = map(pin14, 0, 1023, 1, SIZEMAX);
@@ -104,10 +127,10 @@ void loop() {
   speeder = map(pin15, 0, 1023, 1, SPEEDMAX);
 
   /*
-  Serial.print("Speeder is: ");
-  Serial.println(speeder);
-  Serial.print("Sizer is: ");
-  Serial.println(sizer);
+    Serial.print("Speeder is: ");
+    Serial.println(speeder);
+    Serial.print("Sizer is: ");
+    Serial.println(sizer);
   */
 
   display.clearDisplay();
@@ -352,13 +375,13 @@ void drawTestFlight() {
   drawRotationThing(-6, -12, millis() / 10., radius);
 }
 
-int bToD(unsigned num){
-    unsigned res = 0;
-    
-    for(int i = 0; num > 0; ++i){
-        if((num % 10) == 1) res += (1 << i);
-        num /= 10;
-    }
-    
-    return res;
+int bToD(unsigned num) {
+  unsigned res = 0;
+
+  for (int i = 0; num > 0; ++i) {
+    if ((num % 10) == 1) res += (1 << i);
+    num /= 10;
+  }
+
+  return res;
 }
