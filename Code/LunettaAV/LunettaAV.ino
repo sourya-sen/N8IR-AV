@@ -279,12 +279,12 @@ void drawRotatedSquare(int x, int y, float theta) {
 
 void drawWrongLine(int sp, int sz) {
 
-  int step = 10;
+  int step = map(sp, 1, 1000, 63, 1);
   float lastx = -999;
   float lasty = -999;
   float y = display.height() / 2;
   for (int x = 0; x < display.width() ; x += step) {
-    y = display.height() / 2 + 10 - random(5);
+    y = display.height() / 2 + random(-(sz * 2), (sz * 2));
     if (lastx > -999) {
       display.drawLine(x, y, lastx, lasty, SSD1306_WHITE);
     }
