@@ -19,15 +19,17 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 unsigned long lastTime;
 unsigned long currentTime;
-unsigned long timeInterval = 4000;
+unsigned long timeInterval = 1000;
+
 int selectedPattern = 3;
 int speeder, sizer = 0;
 
-//Global Variable.
-//This is gonna be kludgy but deal with it later.
-
+//Global Variables
 float gl_size = 2.;
+long double gl_time;
 
+//Time calculation thing so that it can be reset
+long double lastMillis = 0;
 
 #define PI 3.14
 #define SIZEMAX 10
@@ -66,9 +68,9 @@ void setup() {
   // display.display();
 
   display.clearDisplay();
-  display.setTextSize(1);             
-  display.setTextColor(SSD1306_WHITE);        
-  display.setCursor(0, 20);           
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 20);
   display.println(F("LUNETTA AV SYNTH"));
   display.println(F("v0.0.1"));
   display.println(F("Sourya Sen 2021"));
@@ -150,6 +152,16 @@ void loop() {
     }
   */
 
+  /*
+    //RESET GLOBALS EVERY X INTERVALS.
+    if (currentTime - lastTime >= timeInterval) {
+      lastTime = currentTime;
+
+      doResetGlobals();
+    }
+    */
+
+  
   switch (selectedPattern) {
     case 0:
       drawNoise(speeder, sizer);
@@ -164,9 +176,11 @@ void loop() {
 
       //      drawRotatedSquare(10, 10, millis() / 10.0);
 
-      for (int i = 0; i < 10; i++) {
-        drawRotatedSquare(i * 2, i * 2, millis() / 100. * i);
-      }
+      //      for (int i = 0; i < 10; i++) {
+      //        drawRotatedSquare(i * 2, i * 2, millis() / 100. * i);
+      //      }
+
+      drawRotationalSquarePattern(speeder, sizer);
       break;
     case 4:
       drawTestFlight();
@@ -195,8 +209,15 @@ void loop() {
     //    Serial.println(selectedPattern);
   }
 
+  long double timeDelta = lastMillis - millis();
+  gl_time += timeDelta;
+
+  lastMillis = millis();
+
 }
 
+//-------------------------------------------------------------
+//-------------------------------------------------------------
 void drawNoise(int sp, int sz) {
   int randMax = SIZEMAX + 2;
   for (int x = 0; x < display.width(); x++) {
@@ -209,6 +230,8 @@ void drawNoise(int sp, int sz) {
   }
 }
 
+//-------------------------------------------------------------
+//-------------------------------------------------------------
 void drawGrowingCircles(int sp, int sz) {
   float increment = float(sp) / float(SPEEDMAX) * 10.;
   increment = constrain(increment, 1., 10.);
@@ -225,78 +248,17 @@ void drawGrowingCircles(int sp, int sz) {
   gl_size += increment;
 }
 
-void resetGrowingCircles() {
-  gl_size = 0.;
-}
-
-void drawStrobes() {
-  int strobeInterval = 500;
-  unsigned long cTime = millis();
-  static unsigned long lastStrobe = 0;
-  static bool state = false;
-
-  if (cTime - lastStrobe >= strobeInterval) {
-    lastStrobe = cTime;
-
-    if (state) {
-      display.fillScreen(WHITE);
-    } else {
-      display.clearDisplay();
-    }
-    state = !state;
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+void drawRotationalSquarePattern(int sp, int sz) {
+  for (int i = 0; i < sz + 3; i ++) {
+    int mappedSpeed = map(sp, 1, 1000, 10, 1);
+    Serial.println(mappedSpeed);
+    drawRotatedSquare(i * 2, i * 2, gl_time/(10. * mappedSpeed) * i);
   }
-
 }
 
-void drawSimplexNoise() {
-  static int offsetx = 0;
-  static int offsety = 0;
-  for (int x = 0; x < display.width(); x += 2) {
-    for (int y = 0; y < display.width(); y += 2) {
-      int r = inoise8(x + offsetx, y + offsety);
-      //      Serial.println(r);
-      if (r > 212) {
-        display.drawPixel(x, y, SSD1306_WHITE);
-      } else {
-        // DO NOTHING :)
-      }
-    }
-  }
-
-  offsetx += 15;
-  offsety += 10;
-}
-
-void drawRotationThing(int x, int y, float theta, int radius) {
-
-  float radtheta = theta * PI / 180.;
-
-  float costheta = cos(radtheta);
-  float sintheta = sin(radtheta);
-
-  float xprime = x * costheta  - y * sintheta;
-  float yprime = x * sintheta + y * costheta;
-
-  //  display.drawCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
-  display.fillCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
-}
-
-void rotateVec2f(Vec2f &vec, float theta) {
-  float radtheta = theta * PI / 180.;
-
-  float costheta = cos(radtheta);
-  float sintheta = sin(radtheta);
-
-  float xprime = vec.x * costheta  - vec.y * sintheta;
-  float yprime = vec.x * sintheta + vec.y * costheta;
-
-  //  xprime += display.width()/2;
-  //  yprime += display.height()/2;
-
-  vec.x = display.width() / 2 + xprime;
-  vec.y = display.height() / 2 + yprime;
-}
-
+//-------------------------------------------------------------
 void drawRotatedSquare(int x, int y, float theta) {
   Vec2f p1, p2, p3, p4;
 
@@ -327,6 +289,8 @@ void drawRotatedSquare(int x, int y, float theta) {
 
 }
 
+//-------------------------------------------------------------
+//-------------------------------------------------------------
 void drawWrongLine(int sp, int sz) {
 
   int step = map(sp, 1, 1000, 63, 1);
@@ -341,9 +305,80 @@ void drawWrongLine(int sp, int sz) {
     lastx = x;
     lasty = y;
   }
+}
+
+//-------------------------------------------------------------
+void drawStrobes() {
+  int strobeInterval = 500;
+  unsigned long cTime = millis();
+  static unsigned long lastStrobe = 0;
+  static bool state = false;
+
+  if (cTime - lastStrobe >= strobeInterval) {
+    lastStrobe = cTime;
+
+    if (state) {
+      display.fillScreen(WHITE);
+    } else {
+      display.clearDisplay();
+    }
+    state = !state;
+  }
 
 }
 
+//-------------------------------------------------------------
+void drawSimplexNoise() {
+  static int offsetx = 0;
+  static int offsety = 0;
+  for (int x = 0; x < display.width(); x += 2) {
+    for (int y = 0; y < display.width(); y += 2) {
+      int r = inoise8(x + offsetx, y + offsety);
+      //      Serial.println(r);
+      if (r > 212) {
+        display.drawPixel(x, y, SSD1306_WHITE);
+      } else {
+        // DO NOTHING :)
+      }
+    }
+  }
+
+  offsetx += 15;
+  offsety += 10;
+}
+
+//-------------------------------------------------------------
+void drawRotationThing(int x, int y, float theta, int radius) {
+
+  float radtheta = theta * PI / 180.;
+
+  float costheta = cos(radtheta);
+  float sintheta = sin(radtheta);
+
+  float xprime = x * costheta  - y * sintheta;
+  float yprime = x * sintheta + y * costheta;
+
+  //  display.drawCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
+  display.fillCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
+}
+
+void rotateVec2f(Vec2f &vec, float theta) {
+  float radtheta = theta * PI / 180.;
+
+  float costheta = cos(radtheta);
+  float sintheta = sin(radtheta);
+
+  float xprime = vec.x * costheta  - vec.y * sintheta;
+  float yprime = vec.x * sintheta + vec.y * costheta;
+
+  //  xprime += display.width()/2;
+  //  yprime += display.height()/2;
+
+  vec.x = display.width() / 2 + xprime;
+  vec.y = display.height() / 2 + yprime;
+}
+
+//-------------------------------------------------------------
 void drawVector() {
   float x = sin(110. * millis() / 1.);
   float y = sin(55. * millis() / 1.);
@@ -375,6 +410,7 @@ void drawTestFlight() {
   drawRotationThing(-6, -12, millis() / 10., radius);
 }
 
+//-------------------------------------------------------------
 int bToD(unsigned num) {
   unsigned res = 0;
 
@@ -384,4 +420,9 @@ int bToD(unsigned num) {
   }
 
   return res;
+}
+
+void doResetGlobals(){
+  gl_size = 0.;
+  gl_time = 0;
 }
