@@ -161,7 +161,6 @@ void loop() {
     }
     */
 
-  
   switch (selectedPattern) {
     case 0:
       drawNoise(speeder, sizer);
@@ -173,14 +172,7 @@ void loop() {
       drawWrongLine(speeder, sizer);
       break;
     case 3:
-
-      //      drawRotatedSquare(10, 10, millis() / 10.0);
-
-      //      for (int i = 0; i < 10; i++) {
-      //        drawRotatedSquare(i * 2, i * 2, millis() / 100. * i);
-      //      }
-
-      drawRotationalSquarePattern(speeder, sizer);
+      drawRotationalSquarePattern(speeder, sizer); //
       break;
     case 4:
       drawTestFlight();
@@ -389,13 +381,16 @@ void drawVector() {
   display.drawCircle(mappedx + display.width() / 2, mappedy + display.height() / 2, 1, SSD1306_WHITE);
 }
 
+//-------------------------------------------------------------
 void drawTestFlight() {
   float radius = sin(millis() / 100.0);
   radius = map(radius, -1, 1, 1, 5);
+  
   drawRotationThing(-6, 6, millis() / 10., radius);
   drawRotationThing(6, 6, millis() / 10., radius);
   drawRotationThing(6, -6, millis() / 10., radius);
   drawRotationThing(-6, -6, millis() / 10., radius);
+  
   float rad2 = map(radius, 1, 5, 10, 1);
   display.fillCircle(display.width() / 2, display.height() / 2, rad2, SSD1306_WHITE);
 
@@ -422,6 +417,7 @@ int bToD(unsigned num) {
   return res;
 }
 
+//-------------------------------------------------------------
 void doResetGlobals(){
   gl_size = 0.;
   gl_time = 0;
