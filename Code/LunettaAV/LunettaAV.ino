@@ -159,7 +159,7 @@ void loop() {
 
       doResetGlobals();
     }
-    */
+  */
 
   switch (selectedPattern) {
     case 0:
@@ -175,16 +175,16 @@ void loop() {
       drawRotationalSquarePattern(speeder, sizer); //
       break;
     case 4:
-      drawTestFlight();
+      drawPulsarBalls(speeder, sizer);
       break;
     case 5:
-      drawStrobes();
+      drawNoise(speeder, sizer);
       break;
     case 6:
-      drawVector();
+      drawNoise(speeder, sizer);
       break;
     case 7:
-      drawTestFlight();
+      drawNoise(speeder, sizer);
       break;
   }
 
@@ -209,6 +209,33 @@ void loop() {
 }
 
 //-------------------------------------------------------------
+//FUNCTIONS FOR MAIN
+//-------------------------------------------------------------
+int bToD(unsigned num) {
+  unsigned res = 0;
+
+  for (int i = 0; num > 0; ++i) {
+    if ((num % 10) == 1) res += (1 << i);
+    num /= 10;
+  }
+
+  return res;
+}
+
+//-------------------------------------------------------------
+void doResetGlobals() {
+  gl_size = 0.;
+  gl_time = 0;
+}
+
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//ALL PATTERNS BELOW
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+
+//-------------------------------------------------------------
+//0 -> WHITE NOISE
 //-------------------------------------------------------------
 void drawNoise(int sp, int sz) {
   int randMax = SIZEMAX + 2;
@@ -223,6 +250,7 @@ void drawNoise(int sp, int sz) {
 }
 
 //-------------------------------------------------------------
+//1 - > GROWING CIRCLES
 //-------------------------------------------------------------
 void drawGrowingCircles(int sp, int sz) {
   float increment = float(sp) / float(SPEEDMAX) * 10.;
@@ -241,15 +269,17 @@ void drawGrowingCircles(int sp, int sz) {
 }
 
 //-------------------------------------------------------------
+//2 - > ROTATIONAL SQUARES
 //-------------------------------------------------------------
 void drawRotationalSquarePattern(int sp, int sz) {
   for (int i = 0; i < sz + 3; i ++) {
     int mappedSpeed = map(sp, 1, 1000, 10, 1);
     Serial.println(mappedSpeed);
-    drawRotatedSquare(i * 2, i * 2, gl_time/(10. * mappedSpeed) * i);
+    drawRotatedSquare(i * 2, i * 2, gl_time / (10. * mappedSpeed) * i);
   }
 }
 
+//CORE FUNCTION
 //-------------------------------------------------------------
 void drawRotatedSquare(int x, int y, float theta) {
   Vec2f p1, p2, p3, p4;
@@ -282,6 +312,7 @@ void drawRotatedSquare(int x, int y, float theta) {
 }
 
 //-------------------------------------------------------------
+//3 - > SQUIGGLY LINE
 //-------------------------------------------------------------
 void drawWrongLine(int sp, int sz) {
 
@@ -299,6 +330,85 @@ void drawWrongLine(int sp, int sz) {
   }
 }
 
+//-------------------------------------------------------------
+//4 - > PULSAR BALLS
+//-------------------------------------------------------------
+//This entire function probably can and should be written better
+void drawPulsarBalls(int sp, int sz) {
+  int mappedSpeedForRadius = map(sp, 1, SPEEDMAX, 5, 20);
+
+  float rad = sin(gl_time / 1000. * mappedSpeedForRadius);
+  int radiusMax = map(sz, 1, SIZEMAX, 2, 6);
+  rad = map(rad, -1, 1, 2, radiusMax);
+
+  float mappedSpeedForTheta = map(sp, 1, SPEEDMAX, 10, 2);
+  Serial.println(mappedSpeedForTheta);
+
+  drawRotatedCircle(-6, 6, gl_time / mappedSpeedForTheta, rad);
+  drawRotatedCircle(6, 6, gl_time / mappedSpeedForTheta, rad);
+  drawRotatedCircle(6, -6, gl_time / mappedSpeedForTheta, rad);
+  drawRotatedCircle(-6, -6, gl_time / mappedSpeedForTheta, rad);
+
+  float rad2 = map(rad, 1, 5, radiusMax + 1, 1);
+  display.fillCircle(display.width() / 2, display.height() / 2, rad2, SSD1306_WHITE);
+
+  drawRotatedCircle(-12, 6, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(12, 6, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(12, -6, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(-12, -6, gl_time / mappedSpeedForTheta, rad - 1);
+
+  drawRotatedCircle(-6, 12, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(6, 12, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(6, -12, gl_time / mappedSpeedForTheta, rad - 1);
+  drawRotatedCircle(-6, -12, gl_time / mappedSpeedForTheta, rad - 1);
+}
+
+//CORE ROTATIONAL CIRCLE FUNCTION
+//-------------------------------------------------------------
+void drawRotatedCircle(int x, int y, float theta, int radius) {
+
+  float radtheta = theta * PI / 180.;
+
+  float costheta = cos(radtheta);
+  float sintheta = sin(radtheta);
+
+  float xprime = x * costheta  - y * sintheta;
+  float yprime = x * sintheta + y * costheta;
+
+  display.fillCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
+}
+
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//FUNCTIONS FOR GEOMETRY MANIPULATION
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+
+//ROTATE VEC2F AROUND THETA
+//-------------------------------------------------------------
+void rotateVec2f(Vec2f &vec, float theta) {
+  float radtheta = theta * PI / 180.;
+
+  float costheta = cos(radtheta);
+  float sintheta = sin(radtheta);
+
+  float xprime = vec.x * costheta  - vec.y * sintheta;
+  float yprime = vec.x * sintheta + vec.y * costheta;
+
+  //  xprime += display.width()/2;
+  //  yprime += display.height()/2;
+
+  vec.x = display.width() / 2 + xprime;
+  vec.y = display.height() / 2 + yprime;
+}
+
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+//-------------------------------------------------------------
+
+
+//SKETCHPAD
 //-------------------------------------------------------------
 void drawStrobes() {
   int strobeInterval = 500;
@@ -340,37 +450,6 @@ void drawSimplexNoise() {
 }
 
 //-------------------------------------------------------------
-void drawRotationThing(int x, int y, float theta, int radius) {
-
-  float radtheta = theta * PI / 180.;
-
-  float costheta = cos(radtheta);
-  float sintheta = sin(radtheta);
-
-  float xprime = x * costheta  - y * sintheta;
-  float yprime = x * sintheta + y * costheta;
-
-  //  display.drawCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
-  display.fillCircle(display.width() / 2 + 2 * xprime, display.height() / 2 + 2 * yprime, radius, SSD1306_WHITE);
-}
-
-void rotateVec2f(Vec2f &vec, float theta) {
-  float radtheta = theta * PI / 180.;
-
-  float costheta = cos(radtheta);
-  float sintheta = sin(radtheta);
-
-  float xprime = vec.x * costheta  - vec.y * sintheta;
-  float yprime = vec.x * sintheta + vec.y * costheta;
-
-  //  xprime += display.width()/2;
-  //  yprime += display.height()/2;
-
-  vec.x = display.width() / 2 + xprime;
-  vec.y = display.height() / 2 + yprime;
-}
-
-//-------------------------------------------------------------
 void drawVector() {
   float x = sin(110. * millis() / 1.);
   float y = sin(55. * millis() / 1.);
@@ -382,43 +461,25 @@ void drawVector() {
 }
 
 //-------------------------------------------------------------
-void drawTestFlight() {
-  float radius = sin(millis() / 100.0);
-  radius = map(radius, -1, 1, 1, 5);
-  
-  drawRotationThing(-6, 6, millis() / 10., radius);
-  drawRotationThing(6, 6, millis() / 10., radius);
-  drawRotationThing(6, -6, millis() / 10., radius);
-  drawRotationThing(-6, -6, millis() / 10., radius);
-  
-  float rad2 = map(radius, 1, 5, 10, 1);
-  display.fillCircle(display.width() / 2, display.height() / 2, rad2, SSD1306_WHITE);
-
-  drawRotationThing(-12, 6, millis() / 10., radius);
-  drawRotationThing(12, 6, millis() / 10., radius);
-  drawRotationThing(12, -6, millis() / 10., radius);
-  drawRotationThing(-12, -6, millis() / 10., radius);
-
-  drawRotationThing(-6, 12, millis() / 10., radius);
-  drawRotationThing(6, 12, millis() / 10., radius);
-  drawRotationThing(6, -12, millis() / 10., radius);
-  drawRotationThing(-6, -12, millis() / 10., radius);
-}
-
-//-------------------------------------------------------------
-int bToD(unsigned num) {
-  unsigned res = 0;
-
-  for (int i = 0; num > 0; ++i) {
-    if ((num % 10) == 1) res += (1 << i);
-    num /= 10;
-  }
-
-  return res;
-}
-
-//-------------------------------------------------------------
-void doResetGlobals(){
-  gl_size = 0.;
-  gl_time = 0;
-}
+//void drawTestFlight() {
+//  float radius = sin(millis() / 100.0);
+//  radius = map(radius, -1, 1, 1, 5);
+//
+//  drawRotationThing(-6, 6, millis() / 10., radius);
+//  drawRotationThing(6, 6, millis() / 10., radius);
+//  drawRotationThing(6, -6, millis() / 10., radius);
+//  drawRotationThing(-6, -6, millis() / 10., radius);
+//
+//  float rad2 = map(radius, 1, 5, 10, 1);
+//  display.fillCircle(display.width() / 2, display.height() / 2, rad2, SSD1306_WHITE);
+//
+//  drawRotationThing(-12, 6, millis() / 10., radius);
+//  drawRotationThing(12, 6, millis() / 10., radius);
+//  drawRotationThing(12, -6, millis() / 10., radius);
+//  drawRotationThing(-12, -6, millis() / 10., radius);
+//
+//  drawRotationThing(-6, 12, millis() / 10., radius);
+//  drawRotationThing(6, 12, millis() / 10., radius);
+//  drawRotationThing(6, -12, millis() / 10., radius);
+//  drawRotationThing(-6, -12, millis() / 10., radius);
+//}
