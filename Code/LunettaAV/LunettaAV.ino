@@ -22,11 +22,14 @@ unsigned long currentTime;
 unsigned long timeInterval = 1000;
 
 int selectedPattern = 3;
+int lastPattern = 0;
 int speeder, sizer = 0;
 
 //Global Variables
 float gl_size = 2.;
 long double gl_time;
+bool gl_refresh = true;
+long double gl_lastRefresh = 0;
 
 //Time calculation thing so that it can be reset
 long double lastMillis = 0;
@@ -41,7 +44,7 @@ struct Vec2f {
 };
 
 Bounce input1 = Bounce(12, 5);
-int patternOffset = 0;
+int patternOffset = 1;
 
 int pinXOOO = 3;
 int pinOXOO = 4;
@@ -71,7 +74,7 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 20);
-  display.println(F("LUNETTA AV SYNTH"));
+  display.println(F("N8IRAV"));
   display.println(F("v0.0.1"));
   display.println(F("Sourya Sen 2021"));
   display.display();
@@ -93,11 +96,17 @@ void setup() {
   pinMode(pinOOXO, INPUT);
   pinMode(pinOOOX, INPUT);
 
-  selectedPattern = random(0, 6);
+  selectedPattern = 5;
 
 }
 
 void loop() {
+
+  input1.update();
+
+  if (input1.risingEdge()) {
+    patternOffset++;
+  }
 
   XOOO = digitalRead(pinXOOO);
   OXOO = digitalRead(pinOXOO);
@@ -108,7 +117,9 @@ void loop() {
   //  Serial.println(debugOut);
 
   inputPattern = bToD(100 * OXOO + 10 * OOXO + OOOX);
-  selectedPattern = (inputPattern + patternOffset) % 5;
+  selectedPattern = (inputPattern + patternOffset) % 8;
+
+  Serial.println(selectedPattern);
 
   if (lastReset != XOOO) {
     //RisingEdge
@@ -135,7 +146,7 @@ void loop() {
     Serial.println(sizer);
   */
 
-  display.clearDisplay();
+  if (gl_refresh) display.clearDisplay();
   unsigned long currentTime = millis();
 
   /*
@@ -172,20 +183,26 @@ void loop() {
       drawWrongLine(speeder, sizer);
       break;
     case 3:
-      drawRotationalSquarePattern(speeder, sizer); //
+      drawRotationalSquarePattern(speeder, sizer);
       break;
     case 4:
       drawPulsarBalls(speeder, sizer);
       break;
     case 5:
-      drawNoise(speeder, sizer);
+      drawMatrix(speeder, sizer);
       break;
     case 6:
-      drawNoise(speeder, sizer);
+      drawNoisyCircles(speeder, sizer);
       break;
     case 7:
-      drawNoise(speeder, sizer);
+      drawSimplexNoise();
       break;
+  }
+
+  if(selectedPattern != lastPattern){
+    display.ssd1306_command(SSD1306_SETSTARTLINE | 0);
+    doResetGlobals();
+    lastPattern = selectedPattern;
   }
 
   display.display();
@@ -193,15 +210,7 @@ void loop() {
 
   digitalWrite(13, HIGH);
 
-  input1.update();
-
-  if (input1.risingEdge()) {
-    patternOffset++;
-    patternOffset = patternOffset % 7;
-    //    Serial.println(selectedPattern);
-  }
-
-  long double timeDelta = lastMillis - millis();
+  long double timeDelta = millis() - lastMillis;
   gl_time += timeDelta;
 
   lastMillis = millis();
@@ -226,6 +235,7 @@ int bToD(unsigned num) {
 void doResetGlobals() {
   gl_size = 0.;
   gl_time = 0;
+  gl_lastRefresh = 0;
 }
 
 //-------------------------------------------------------------
@@ -238,6 +248,7 @@ void doResetGlobals() {
 //0 -> WHITE NOISE
 //-------------------------------------------------------------
 void drawNoise(int sp, int sz) {
+  gl_refresh = true;
   int randMax = SIZEMAX + 2;
   for (int x = 0; x < display.width(); x++) {
     for (int y = 0; y < display.width(); y++) {
@@ -253,6 +264,7 @@ void drawNoise(int sp, int sz) {
 //1 - > GROWING CIRCLES
 //-------------------------------------------------------------
 void drawGrowingCircles(int sp, int sz) {
+  gl_refresh = true;
   float increment = float(sp) / float(SPEEDMAX) * 10.;
   increment = constrain(increment, 1., 10.);
   for (int i = 1; i <= sz; i += 1) {
@@ -272,9 +284,10 @@ void drawGrowingCircles(int sp, int sz) {
 //2 - > ROTATIONAL SQUARES
 //-------------------------------------------------------------
 void drawRotationalSquarePattern(int sp, int sz) {
+  gl_refresh = true;
   for (int i = 0; i < sz + 3; i ++) {
     int mappedSpeed = map(sp, 1, 1000, 10, 1);
-    Serial.println(mappedSpeed);
+    //    Serial.println(mappedSpeed);
     drawRotatedSquare(i * 2, i * 2, gl_time / (10. * mappedSpeed) * i);
   }
 }
@@ -315,7 +328,7 @@ void drawRotatedSquare(int x, int y, float theta) {
 //3 - > SQUIGGLY LINE
 //-------------------------------------------------------------
 void drawWrongLine(int sp, int sz) {
-
+  gl_refresh = true;
   int step = map(sp, 1, 1000, 63, 1);
   float lastx = -999;
   float lasty = -999;
@@ -335,6 +348,8 @@ void drawWrongLine(int sp, int sz) {
 //-------------------------------------------------------------
 //This entire function probably can and should be written better
 void drawPulsarBalls(int sp, int sz) {
+  gl_refresh = true;
+
   int mappedSpeedForRadius = map(sp, 1, SPEEDMAX, 5, 20);
 
   float rad = sin(gl_time / 1000. * mappedSpeedForRadius);
@@ -342,7 +357,7 @@ void drawPulsarBalls(int sp, int sz) {
   rad = map(rad, -1, 1, 2, radiusMax);
 
   float mappedSpeedForTheta = map(sp, 1, SPEEDMAX, 10, 2);
-  Serial.println(mappedSpeedForTheta);
+  //  Serial.println(mappedSpeedForTheta);
 
   drawRotatedCircle(-6, 6, gl_time / mappedSpeedForTheta, rad);
   drawRotatedCircle(6, 6, gl_time / mappedSpeedForTheta, rad);
@@ -379,6 +394,110 @@ void drawRotatedCircle(int x, int y, float theta, int radius) {
 }
 
 //-------------------------------------------------------------
+//5 - > MATRIX
+//-------------------------------------------------------------
+void drawMatrix(int sp, int sz) {
+
+  int refreshTime = map(sp, 1, SPEEDMAX, 800, 100);
+  int density = map(sz, 1, SIZEMAX, 1, 16);
+
+  if (gl_time - gl_lastRefresh >= refreshTime) {
+    display.clearDisplay();
+    gl_refresh = true;
+    gl_lastRefresh = gl_time;
+    //    Serial.println(int(gl_time));
+    //    Serial.println(int(gl_lastRefresh));
+  }
+
+  if (gl_refresh) {
+    display.setTextSize(1);
+    display.cp437(true);
+    for (int x = 0; x < display.width(); x += 8) {
+      for (int y = 0; y < display.height(); y += 8) {
+        int selector = random(0, 8 + y / density);
+        int rc = random(256);
+        display.setCursor(x, y);
+        switch (selector) {
+          case 0:
+            display.write(' ');
+            break;
+          case 1:
+            display.write(x + gl_time / 100.);
+            break;
+          case 2:
+            display.write(y + gl_time / 100.);
+            break;
+          case 3:
+            display.fillRect(x, y, 4, 4, SSD1306_WHITE);
+            break;
+          case 4:
+            display.fillRect(x, y, 4, 4, SSD1306_WHITE);
+            break;
+          default:
+            display.write(' ');
+            break;
+        }
+      }
+    }
+    gl_refresh = false;
+  }
+
+  if(!gl_refresh){
+     display.ssd1306_command(SSD1306_SETSTARTLINE | (64 - int(gl_time/100.) % 64));
+  }
+
+  for (int x = 0; x < display.width(); x += 8) {
+    for (int y = 0; y < display.height(); y += 8) {
+      int r = random(0, 512);
+      if (r == 1) {
+        int t = random(0, 2);
+        if (t == 0) {
+          display.fillRect(x, y, 4, 4, SSD1306_WHITE);
+        } else {
+          int c = random(256);
+          display.setCursor(x, y);
+          display.write(c);
+        }
+      }
+    }
+  }
+}
+
+//-------------------------------------------------------------
+//6 - > NOISY CIRCLES
+//-------------------------------------------------------------
+void drawNoisyCircles(int sp, int sz) {
+  gl_refresh = true;
+
+  float timeFactor = map(sp, 1, SPEEDMAX, 1000., 10.);
+  float sizeFactor = map(sz, 1, SIZEMAX, 1, 16);
+
+  for (int num = 0; num < 8; num ++) {
+    float lastx = -999;
+    float lasty = -999;
+    for (int i = 0; i < 361; i += 8) {
+      float radtheta = i * PI / 180.;
+      float noisy = inoise8(i * gl_time / timeFactor);
+
+      noisy = map(noisy, -70, 70, 0, 16);
+
+      float radius = 4 * sin(i + gl_time / timeFactor) + num * sizeFactor + noisy;
+
+      float x = display.width() / 2 + radius * cos(radtheta);
+      float y = display.height() / 2 + radius * sin(radtheta);
+
+      if (lastx > -999) {
+        display.drawLine(x, y, lastx, lasty, SSD1306_WHITE);
+      }
+
+      lastx = x;
+      lasty = y;
+    }
+  }
+
+}
+
+//-------------------------------------------------------------
 //-------------------------------------------------------------
 //FUNCTIONS FOR GEOMETRY MANIPULATION
 //-------------------------------------------------------------
@@ -409,9 +528,13 @@ void rotateVec2f(Vec2f &vec, float theta) {
 
 
 //SKETCHPAD
-//-------------------------------------------------------------
+
+//------------------------------------------------------------
+
+
 void drawStrobes() {
   int strobeInterval = 500;
+
   unsigned long cTime = millis();
   static unsigned long lastStrobe = 0;
   static bool state = false;
@@ -431,22 +554,20 @@ void drawStrobes() {
 
 //-------------------------------------------------------------
 void drawSimplexNoise() {
-  static int offsetx = 0;
-  static int offsety = 0;
+  gl_refresh = true;
+  
   for (int x = 0; x < display.width(); x += 2) {
     for (int y = 0; y < display.width(); y += 2) {
-      int r = inoise8(x + offsetx, y + offsety);
-      //      Serial.println(r);
-      if (r > 212) {
+      int r = inoise8(x * gl_time/10., y * gl_time/100.);
+      r = map(r, -70, 70, 0, 255);
+      Serial.println(r);
+      if (r > 300) {
         display.drawPixel(x, y, SSD1306_WHITE);
       } else {
         // DO NOTHING :)
       }
     }
   }
-
-  offsetx += 15;
-  offsety += 10;
 }
 
 //-------------------------------------------------------------
