@@ -113,6 +113,11 @@ void loop() {
   OOXO = digitalRead(pinOOXO);
   OOOX = digitalRead(pinOOOX);
 
+//  XOOO = 1;
+//  OXOO = 1;
+//  OOXO = 0;
+//  OOOX = 1;
+
   //  int debugOut = 10000 + 1000 * XOOO + 100 * OXOO + 10 * OOXO + OOOX;
   //  Serial.println(debugOut);
 
@@ -138,13 +143,11 @@ void loop() {
 
   int pin15 = analogRead(15);
   speeder = map(pin15, 0, 1023, 1, SPEEDMAX);
-
-  /*
+  
     Serial.print("Speeder is: ");
     Serial.println(speeder);
     Serial.print("Sizer is: ");
     Serial.println(sizer);
-  */
 
   if (gl_refresh) display.clearDisplay();
   unsigned long currentTime = millis();
@@ -560,7 +563,7 @@ void drawSimplexNoise() {
     for (int y = 0; y < display.width(); y += 2) {
       int r = inoise8(x * gl_time/10., y * gl_time/100.);
       r = map(r, -70, 70, 0, 255);
-      Serial.println(r);
+//      Serial.println(r);
       if (r > 300) {
         display.drawPixel(x, y, SSD1306_WHITE);
       } else {

@@ -11397,6 +11397,9 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <attribute name="NAME" x="196.85" y="-156.4386" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="196.85" y="-151.638" size="1.778" layer="96" rot="R180"/>
 </instance>
+<instance part="IC5" gate="P" x="30.48" y="-208.28" smashed="yes">
+<attribute name="NAME" x="29.21" y="-208.915" size="1.778" layer="95"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -11431,6 +11434,11 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <pinref part="R22" gate="G$1" pin="1"/>
 <wire x1="27.94" y1="-83.82" x2="17.78" y2="-83.82" width="0.1524" layer="91"/>
 <label x="17.78" y="-83.82" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC5" gate="P" pin="VDD"/>
+<wire x1="30.48" y1="-200.66" x2="30.48" y2="-195.58" width="0.1524" layer="91"/>
+<label x="30.48" y="-195.58" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -11500,6 +11508,16 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 <wire x1="144.78" y1="-254" x2="144.78" y2="-271.78" width="0.1524" layer="91"/>
 <junction x="144.78" y="-254"/>
 <label x="144.78" y="-271.78" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC5" gate="P" pin="VSS"/>
+<wire x1="30.48" y1="-215.9" x2="30.48" y2="-223.52" width="0.1524" layer="91"/>
+<label x="30.48" y="-223.52" size="1.778" layer="95"/>
+<pinref part="IC5" gate="A" pin="ENA"/>
+<wire x1="53.34" y1="-190.5" x2="48.26" y2="-190.5" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="-190.5" x2="48.26" y2="-215.9" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="-215.9" x2="30.48" y2="-215.9" width="0.1524" layer="91"/>
+<junction x="30.48" y="-215.9"/>
 </segment>
 </net>
 <net name="SR1" class="0">
