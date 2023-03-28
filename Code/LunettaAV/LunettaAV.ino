@@ -45,8 +45,10 @@ struct Vec2f {
   float y;
 };
 
-Bounce input1 = Bounce(9, 5);
-int patternOffset = 1;
+int bouncePin = 9;
+
+Bounce patternButton = Bounce(bouncePin, 5);
+int patternOffset = 0;
 
 int pinXOOO = 3;
 int pinOXOO = 4;
@@ -90,9 +92,9 @@ void setup() {
 
   lastTime = millis();
   pinMode(13, OUTPUT);
-  pinMode(9, INPUT); //this is for the button
+  pinMode(bouncePin, INPUT); //this is for the button
 
-  pinMode(14, INPUT);
+  pinMode(14, INPUT); //ANALOGINPUTS
   pinMode(15, INPUT);
 
   pinMode(pinXOOO, INPUT);
@@ -103,15 +105,15 @@ void setup() {
   pinMode(slaveSelectPin, OUTPUT);
   SPI.begin();
 
-  selectedPattern = 5;
+  selectedPattern = random(0,8);
 
 }
 
 void loop() {
 
-  input1.update();
+  patternButton.update();
 
-  if (input1.risingEdge()) {
+  if (patternButton.risingEdge()) {
     patternOffset++;
   }
 
