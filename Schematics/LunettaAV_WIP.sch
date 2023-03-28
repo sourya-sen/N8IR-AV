@@ -13011,9 +13011,9 @@ diameter 2 mm, horizontal, grid 10.16 mm</description>
 <attribute name="NAME" x="35.56" y="58.42" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="35.56" y="60.96" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="R3" gate="G$1" x="-35.56" y="50.8" smashed="yes" rot="R90">
-<attribute name="NAME" x="-37.0586" y="46.99" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="-32.258" y="46.99" size="1.778" layer="96" rot="R90"/>
+<instance part="R3" gate="G$1" x="-27.94" y="66.04" smashed="yes" rot="R90">
+<attribute name="NAME" x="-29.4386" y="62.23" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-24.638" y="62.23" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="FRAME1" gate="G$1" x="-142.24" y="-76.2" smashed="yes">
 <attribute name="DRAWING_NAME" x="176.911" y="-56.769" size="2.54" layer="94" font="vector"/>
@@ -13208,8 +13208,8 @@ diameter 2 mm, horizontal, grid 10.16 mm</description>
 </segment>
 <segment>
 <pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="-35.56" y1="45.72" x2="-35.56" y2="40.64" width="0.1524" layer="91"/>
-<label x="-35.56" y="40.64" size="1.778" layer="95"/>
+<wire x1="-27.94" y1="60.96" x2="-27.94" y2="55.88" width="0.1524" layer="91"/>
+<label x="-27.94" y="55.88" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="IC4" gate="P" pin="V-"/>
@@ -13450,13 +13450,13 @@ diameter 2 mm, horizontal, grid 10.16 mm</description>
 </net>
 <net name="DIN1" class="0">
 <segment>
-<pinref part="B1" gate="G$1" pin="12/DIN"/>
-<wire x1="-38.1" y1="76.2" x2="-35.56" y2="76.2" width="0.1524" layer="91"/>
-<label x="-33.02" y="76.2" size="1.778" layer="95"/>
+<label x="-25.4" y="91.44" size="1.778" layer="95"/>
 <pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="-35.56" y1="76.2" x2="-33.02" y2="76.2" width="0.1524" layer="91"/>
-<wire x1="-35.56" y1="55.88" x2="-35.56" y2="76.2" width="0.1524" layer="91"/>
-<junction x="-35.56" y="76.2"/>
+<wire x1="-27.94" y1="91.44" x2="-25.4" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="-27.94" y1="71.12" x2="-27.94" y2="91.44" width="0.1524" layer="91"/>
+<pinref part="B1" gate="G$1" pin="9*/RX2"/>
+<wire x1="-27.94" y1="91.44" x2="-38.1" y2="91.44" width="0.1524" layer="91"/>
+<junction x="-27.94" y="91.44"/>
 </segment>
 <segment>
 <pinref part="S1" gate="G$1" pin="2"/>

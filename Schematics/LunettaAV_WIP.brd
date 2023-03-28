@@ -3089,11 +3089,11 @@ design rules under a new name.</description>
 <wire x1="-30.48" y1="31.75" x2="-77.47" y2="41.26" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="DIN1">
-<contactref element="B1" pad="12"/>
 <contactref element="R3" pad="2"/>
 <contactref element="S1" pad="3"/>
-<wire x1="-15.24" y1="36.83" x2="-13.97" y2="110.49" width="0" layer="19" extent="1-1"/>
-<wire x1="-90.27" y1="10.12" x2="-15.24" y2="36.83" width="0" layer="19" extent="1-1"/>
+<contactref element="B1" pad="9"/>
+<wire x1="-15.24" y1="29.21" x2="-13.97" y2="110.49" width="0" layer="19" extent="1-1"/>
+<wire x1="-90.27" y1="10.12" x2="-15.24" y2="29.21" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="5V">
 <contactref element="IC4" pad="4"/>
