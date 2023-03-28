@@ -31,6 +31,8 @@ long double gl_time;
 bool gl_refresh = true;
 long double gl_lastRefresh = 0;
 
+int lastDigipotValue = 0;
+
 //Time calculation thing so that it can be reset
 long double lastMillis = 0;
 
@@ -43,13 +45,15 @@ struct Vec2f {
   float y;
 };
 
-Bounce input1 = Bounce(12, 5);
+Bounce input1 = Bounce(9, 5);
 int patternOffset = 1;
 
 int pinXOOO = 3;
 int pinOXOO = 4;
 int pinOOXO = 5;
 int pinOOOX = 6;
+
+int slaveSelectPin = 10;
 
 int XOOO, OXOO, OOXO, OOOX = 0;
 int inputPattern = 0;
@@ -86,7 +90,7 @@ void setup() {
 
   lastTime = millis();
   pinMode(13, OUTPUT);
-  pinMode(12, INPUT);
+  pinMode(9, INPUT); //this is for the button
 
   pinMode(14, INPUT);
   pinMode(15, INPUT);
@@ -95,6 +99,9 @@ void setup() {
   pinMode(pinOXOO, INPUT);
   pinMode(pinOOXO, INPUT);
   pinMode(pinOOOX, INPUT);
+
+  pinMode(slaveSelectPin, OUTPUT);
+  SPI.begin();
 
   selectedPattern = 5;
 
@@ -124,6 +131,7 @@ void loop() {
   inputPattern = bToD(100 * OXOO + 10 * OOXO + OOOX);
   selectedPattern = (inputPattern + patternOffset) % 8;
 
+  Serial.print("Selected Pattern: ");
   Serial.println(selectedPattern);
 
   if (lastReset != XOOO) {
@@ -148,6 +156,15 @@ void loop() {
     Serial.println(speeder);
     Serial.print("Sizer is: ");
     Serial.println(sizer);
+
+  int dPotValue = map(pin14, 0, 1023, 0, 255);
+
+  if(abs(lastDigipotValue - dPotValue) > 10){
+    digitalPotWrite(dPotValue);
+    lastDigipotValue = dPotValue;
+  }
+  
+  
 
   if (gl_refresh) display.clearDisplay();
   unsigned long currentTime = millis();
@@ -211,7 +228,7 @@ void loop() {
   display.display();
   //  delay(1);
 
-  digitalWrite(13, HIGH);
+  //digitalWrite(13, HIGH);
 
   long double timeDelta = millis() - lastMillis;
   gl_time += timeDelta;
@@ -239,6 +256,19 @@ void doResetGlobals() {
   gl_size = 0.;
   gl_time = 0;
   gl_lastRefresh = 0;
+}
+
+//-------------------------------------------------------------
+int digitalPotWrite(unsigned int value){
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+  //take the SS pin low.
+  digitalWrite(slaveSelectPin, LOW);
+  //send the address.
+  SPI.transfer(B00010001);
+  SPI.transfer(value);
+  //take the SS pin high.
+  digitalWrite(slaveSelectPin, HIGH);
+  SPI.endTransaction();
 }
 
 //-------------------------------------------------------------
