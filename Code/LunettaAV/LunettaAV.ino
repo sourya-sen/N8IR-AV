@@ -99,7 +99,7 @@ void setup() {
   display.clearDisplay();
 
   //---
-  
+
   lastTime = millis();
 
   //Setup the I/O pins
@@ -149,7 +149,7 @@ void loop() {
   Serial.print("Selected Pattern: ");
   Serial.println(selectedPattern);
 
-  
+
   //Note 29.03.23 ---- > Retest this with this on, currently the reset function is not being used AT ALL
   if (lastReset != XOOO) {
     //RisingEdge
@@ -252,8 +252,9 @@ int digitalPotWrite(unsigned int value) {
   SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
   //take the SS pin low.
   digitalWrite(slaveSelectPin, LOW);
-  //send the address.
+  //send the write command.
   SPI.transfer(B00010001);
+  //send the value
   SPI.transfer(value);
   //take the SS pin high.
   digitalWrite(slaveSelectPin, HIGH);
