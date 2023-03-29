@@ -14429,6 +14429,10 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <class number="0" name="default" width="0" drill="0">
 </class>
 <class number="1" name="POWER" width="0.635" drill="0">
+<clearance class="1" value="0.508"/>
+</class>
+<class number="2" name="COMMS" width="0.635" drill="0">
+<clearance class="2" value="0.508"/>
 </class>
 </classes>
 <parts>
@@ -14952,7 +14956,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <label x="-116.84" y="45.72" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$3" class="0">
+<net name="SCL" class="2">
 <segment>
 <pinref part="B1" gate="G$1" pin="A5/19/SCL0"/>
 <wire x1="-38.1" y1="121.92" x2="-33.02" y2="121.92" width="0.1524" layer="91"/>
@@ -14966,9 +14970,10 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="-2.54" y="121.92"/>
 <pinref part="OL96$1" gate="G$1" pin="SCL"/>
 <wire x1="-2.54" y1="147.32" x2="5.08" y2="147.32" width="0.1524" layer="91"/>
+<label x="-22.86" y="121.92" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$4" class="0">
+<net name="SDA" class="2">
 <segment>
 <pinref part="B1" gate="G$1" pin="A4/18/SDA0"/>
 <wire x1="-38.1" y1="124.46" x2="-25.4" y2="124.46" width="0.1524" layer="91"/>
@@ -14983,6 +14988,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="0" y1="144.78" x2="5.08" y2="144.78" width="0.1524" layer="91"/>
 <wire x1="-25.4" y1="119.38" x2="0" y2="119.38" width="0.1524" layer="91"/>
 <junction x="0" y="119.38"/>
+<label x="-22.86" y="119.38" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="3V3" class="1">
@@ -15541,7 +15547,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="83.82" y="170.18"/>
 </segment>
 </net>
-<net name="DPOTSCK" class="0">
+<net name="DPOTSCK" class="2">
 <segment>
 <pinref part="B1" gate="G$1" pin="13/SCK"/>
 <wire x1="-38.1" y1="78.74" x2="-2.54" y2="78.74" width="0.1524" layer="91"/>
@@ -15552,7 +15558,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="-2.54" y="78.74"/>
 </segment>
 </net>
-<net name="DPOTDATA" class="0">
+<net name="DPOTDATA" class="2">
 <segment>
 <pinref part="B1" gate="G$1" pin="11/DOUT"/>
 <wire x1="-38.1" y1="73.66" x2="-10.16" y2="73.66" width="0.1524" layer="91"/>
@@ -15563,7 +15569,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="-10.16" y="73.66"/>
 </segment>
 </net>
-<net name="DPOTSEL" class="0">
+<net name="DPOTSEL" class="2">
 <segment>
 <pinref part="B1" gate="G$1" pin="10*/TX2/CS"/>
 <wire x1="-38.1" y1="71.12" x2="-17.78" y2="71.12" width="0.1524" layer="91"/>
@@ -16596,21 +16602,21 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="294.64" y="-91.44"/>
 </segment>
 </net>
-<net name="DPOTSEL" class="0">
+<net name="DPOTSEL" class="2">
 <segment>
 <pinref part="MCP41050" gate="G$0" pin="!CS!"/>
 <wire x1="154.94" y1="-269.24" x2="137.16" y2="-269.24" width="0.1524" layer="91"/>
 <label x="137.16" y="-269.24" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="DPOTSCK" class="0">
+<net name="DPOTSCK" class="2">
 <segment>
 <pinref part="MCP41050" gate="G$0" pin="SCK"/>
 <wire x1="154.94" y1="-271.78" x2="137.16" y2="-271.78" width="0.1524" layer="91"/>
 <label x="137.16" y="-271.78" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="DPOTDATA" class="0">
+<net name="DPOTDATA" class="2">
 <segment>
 <pinref part="MCP41050" gate="G$0" pin="SI"/>
 <wire x1="154.94" y1="-276.86" x2="132.08" y2="-276.86" width="0.1524" layer="91"/>
