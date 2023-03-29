@@ -23,7 +23,7 @@ unsigned long timeInterval = 1000;
 
 int selectedPattern = 3;
 int lastPattern = 0;
-int speeder, sizer = 0;
+int _speed, _density = 0;
 
 //Global Variables
 float gl_size = 2.;
@@ -31,13 +31,11 @@ long double gl_time;
 bool gl_refresh = true;
 long double gl_lastRefresh = 0;
 
-int lastDigipotValue = 0;
-
 //Time calculation thing so that it can be reset
 long double lastMillis = 0;
 
 #define PI 3.14
-#define SIZEMAX 10
+#define DENSEMAX 10
 #define SPEEDMAX 1000
 
 struct Vec2f {
@@ -45,24 +43,34 @@ struct Vec2f {
   float y;
 };
 
+//Pattern offset
 int bouncePin = 9;
-
 Bounce patternButton = Bounce(bouncePin, 5);
 int patternOffset = 0;
 
+//Pattern select input
 int pinXOOO = 3;
 int pinOXOO = 4;
 int pinOOXO = 5;
 int pinOOOX = 6;
 
+//Analog inputs
+int densityPin = 14;
+int speedPin = 15;
+
+//Digipot
 int slaveSelectPin = 10;
 
 int XOOO, OXOO, OOXO, OOOX = 0;
 int inputPattern = 0;
 int lastReset = 0;
 
+int lastDigipotValue = 0;
+
 void setup() {
   Serial.begin(9600);
+
+  //OLED SCREEN (I2C) SETUP
   Wire.setSCL(19);
   Wire.setSDA(18);
 
@@ -81,32 +89,37 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 20);
   display.println(F("N8IRAV"));
-  display.println(F("v0.0.1"));
-  display.println(F("Sourya Sen 2021"));
+  display.println(F("v0.0.2"));
+  display.println(F("Sourya Sen 2023"));
   display.display();
 
-  delay(2000); // Pause for 2 seconds
+  delay(500); // Pause for half a second
 
   // Clear the buffer
   display.clearDisplay();
 
+  //---
+  
   lastTime = millis();
-  pinMode(13, OUTPUT);
+
+  //Setup the I/O pins
+  pinMode(13, OUTPUT); //SCK For Digipot.
+
   pinMode(bouncePin, INPUT); //this is for the button
 
-  pinMode(14, INPUT); //ANALOGINPUTS
-  pinMode(15, INPUT);
+  pinMode(densityPin, INPUT); //ANALOGINPUTS
+  pinMode(speedPin, INPUT);
 
   pinMode(pinXOOO, INPUT);
   pinMode(pinOXOO, INPUT);
   pinMode(pinOOXO, INPUT);
   pinMode(pinOOOX, INPUT);
 
+  //Setup Digipot pins
   pinMode(slaveSelectPin, OUTPUT);
   SPI.begin();
 
-  selectedPattern = random(0,8);
-
+  selectedPattern = random(0, 8);
 }
 
 void loop() {
@@ -122,10 +135,10 @@ void loop() {
   OOXO = digitalRead(pinOOXO);
   OOOX = digitalRead(pinOOOX);
 
-//  XOOO = 1;
-//  OXOO = 1;
-//  OOXO = 0;
-//  OOOX = 1;
+  //  XOOO = 1;
+  //  OXOO = 1;
+  //  OOXO = 0;
+  //  OOOX = 1;
 
   //  int debugOut = 10000 + 1000 * XOOO + 100 * OXOO + 10 * OOXO + OOOX;
   //  Serial.println(debugOut);
@@ -136,6 +149,8 @@ void loop() {
   Serial.print("Selected Pattern: ");
   Serial.println(selectedPattern);
 
+  
+  //Note 29.03.23 ---- > Retest this with this on, currently the reset function is not being used AT ALL
   if (lastReset != XOOO) {
     //RisingEdge
     if (XOOO == 1) {
@@ -148,89 +163,61 @@ void loop() {
     lastReset = XOOO;
   }
 
-  int pin14 = analogRead(14);
-  sizer = map(pin14, 0, 1023, 1, SIZEMAX);
+  int densityValue = analogRead(densityPin);
+  _density = map(densityValue, 0, 1023, 1, DENSEMAX);
 
-  int pin15 = analogRead(15);
-  speeder = map(pin15, 0, 1023, 1, SPEEDMAX);
-  
-    Serial.print("Speeder is: ");
-    Serial.println(speeder);
-    Serial.print("Sizer is: ");
-    Serial.println(sizer);
+  int speedValue = analogRead(speedPin);
+  _speed = map(speedValue, 0, 1023, 1, SPEEDMAX);
 
-  int dPotValue = map(pin14, 0, 1023, 0, 255);
+  Serial.print("_speed is: ");
+  Serial.println(_speed);
+  Serial.print("_density is: ");
+  Serial.println(_density);
 
-  if(abs(lastDigipotValue - dPotValue) > 10){
+  int dPotValue = map(densityValue, 0, 1023, 0, 255);
+
+  if (abs(lastDigipotValue - dPotValue) > 10) {
     digitalPotWrite(dPotValue);
     lastDigipotValue = dPotValue;
   }
-  
-  
 
   if (gl_refresh) display.clearDisplay();
   unsigned long currentTime = millis();
 
-  /*
-    //CHANGE PATTERNS EVERY X INTERVALS.
-    if (currentTime - lastTime >= timeInterval) {
-      lastTime = currentTime;
-
-      selectedPattern ++;
-      selectedPattern = selectedPattern % 5;
-      resetGrowingCircles(); //better to reset all global variables here, what's the best way to do?
-
-      //Ignore the top just to test...
-      selectedPattern = 5;
-    }
-  */
-
-  /*
-    //RESET GLOBALS EVERY X INTERVALS.
-    if (currentTime - lastTime >= timeInterval) {
-      lastTime = currentTime;
-
-      doResetGlobals();
-    }
-  */
-
   switch (selectedPattern) {
     case 0:
-      drawNoise(speeder, sizer);
+      drawNoise(_speed, _density);
       break;
     case 1:
-      drawGrowingCircles(speeder, sizer);
+      drawGrowingCircles(_speed, _density);
       break;
     case 2:
-      drawWrongLine(speeder, sizer);
+      drawWrongLine(_speed, _density);
       break;
     case 3:
-      drawRotationalSquarePattern(speeder, sizer);
+      drawRotationalSquarePattern(_speed, _density);
       break;
     case 4:
-      drawPulsarBalls(speeder, sizer);
+      drawPulsarBalls(_speed, _density);
       break;
     case 5:
-      drawMatrix(speeder, sizer);
+      drawMatrix(_speed, _density);
       break;
     case 6:
-      drawNoisyCircles(speeder, sizer);
+      drawNoisyCircles(_speed, _density);
       break;
     case 7:
       drawSimplexNoise();
       break;
   }
 
-  if(selectedPattern != lastPattern){
+  if (lastPattern != selectedPattern) {
     display.ssd1306_command(SSD1306_SETSTARTLINE | 0);
     doResetGlobals();
     lastPattern = selectedPattern;
   }
 
   display.display();
-  //  delay(1);
-
-  //digitalWrite(13, HIGH);
 
   long double timeDelta = millis() - lastMillis;
   gl_time += timeDelta;
@@ -261,7 +248,7 @@ void doResetGlobals() {
 }
 
 //-------------------------------------------------------------
-int digitalPotWrite(unsigned int value){
+int digitalPotWrite(unsigned int value) {
   SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
   //take the SS pin low.
   digitalWrite(slaveSelectPin, LOW);
@@ -282,12 +269,12 @@ int digitalPotWrite(unsigned int value){
 //-------------------------------------------------------------
 //0 -> WHITE NOISE
 //-------------------------------------------------------------
-void drawNoise(int sp, int sz) {
+void drawNoise(int spd, int dns) {
   gl_refresh = true;
-  int randMax = SIZEMAX + 2;
+  int randMax = DENSEMAX + 2;
   for (int x = 0; x < display.width(); x++) {
     for (int y = 0; y < display.width(); y++) {
-      int r = random(0, (randMax - sz));
+      int r = random(0, (randMax - dns));
       if (r  == 1) {
         display.drawPixel(x, y, SSD1306_WHITE);
       }
@@ -298,11 +285,11 @@ void drawNoise(int sp, int sz) {
 //-------------------------------------------------------------
 //1 - > GROWING CIRCLES
 //-------------------------------------------------------------
-void drawGrowingCircles(int sp, int sz) {
+void drawGrowingCircles(int spd, int dns) {
   gl_refresh = true;
-  float increment = float(sp) / float(SPEEDMAX) * 10.;
+  float increment = float(spd) / float(SPEEDMAX) * 10.;
   increment = constrain(increment, 1., 10.);
-  for (int i = 1; i <= sz; i += 1) {
+  for (int i = 1; i <= dns; i += 1) {
     display.drawCircle(display.width() / 2, display.height() / 2, i * gl_size / 2, SSD1306_WHITE);
 
   }
@@ -318,10 +305,10 @@ void drawGrowingCircles(int sp, int sz) {
 //-------------------------------------------------------------
 //2 - > ROTATIONAL SQUARES
 //-------------------------------------------------------------
-void drawRotationalSquarePattern(int sp, int sz) {
+void drawRotationalSquarePattern(int spd, int dns) {
   gl_refresh = true;
-  for (int i = 0; i < sz + 3; i ++) {
-    int mappedSpeed = map(sp, 1, 1000, 10, 1);
+  for (int i = 0; i < dns + 3; i ++) {
+    int mappedSpeed = map(spd, 1, 1000, 10, 1);
     //    Serial.println(mappedSpeed);
     drawRotatedSquare(i * 2, i * 2, gl_time / (10. * mappedSpeed) * i);
   }
@@ -362,14 +349,14 @@ void drawRotatedSquare(int x, int y, float theta) {
 //-------------------------------------------------------------
 //3 - > SQUIGGLY LINE
 //-------------------------------------------------------------
-void drawWrongLine(int sp, int sz) {
+void drawWrongLine(int spd, int dns) {
   gl_refresh = true;
-  int step = map(sp, 1, 1000, 63, 1);
+  int step = map(spd, 1, 1000, 63, 1);
   float lastx = -999;
   float lasty = -999;
   float y = display.height() / 2;
   for (int x = 0; x < display.width() ; x += step) {
-    y = display.height() / 2 + random(-(sz * 2), (sz * 2));
+    y = display.height() / 2 + random(-(dns * 2), (dns * 2));
     if (lastx > -999) {
       display.drawLine(x, y, lastx, lasty, SSD1306_WHITE);
     }
@@ -382,16 +369,16 @@ void drawWrongLine(int sp, int sz) {
 //4 - > PULSAR BALLS
 //-------------------------------------------------------------
 //This entire function probably can and should be written better
-void drawPulsarBalls(int sp, int sz) {
+void drawPulsarBalls(int spd, int dns) {
   gl_refresh = true;
 
-  int mappedSpeedForRadius = map(sp, 1, SPEEDMAX, 5, 20);
+  int mappedSpeedForRadius = map(spd, 1, SPEEDMAX, 5, 20);
 
   float rad = sin(gl_time / 1000. * mappedSpeedForRadius);
-  int radiusMax = map(sz, 1, SIZEMAX, 2, 6);
+  int radiusMax = map(dns, 1, DENSEMAX, 2, 6);
   rad = map(rad, -1, 1, 2, radiusMax);
 
-  float mappedSpeedForTheta = map(sp, 1, SPEEDMAX, 10, 2);
+  float mappedSpeedForTheta = map(spd, 1, SPEEDMAX, 10, 2);
   //  Serial.println(mappedSpeedForTheta);
 
   drawRotatedCircle(-6, 6, gl_time / mappedSpeedForTheta, rad);
@@ -431,10 +418,10 @@ void drawRotatedCircle(int x, int y, float theta, int radius) {
 //-------------------------------------------------------------
 //5 - > MATRIX
 //-------------------------------------------------------------
-void drawMatrix(int sp, int sz) {
+void drawMatrix(int spd, int dns) {
 
-  int refreshTime = map(sp, 1, SPEEDMAX, 800, 100);
-  int density = map(sz, 1, SIZEMAX, 1, 16);
+  int refreshTime = map(spd, 1, SPEEDMAX, 800, 100);
+  int density = map(dns, 1, DENSEMAX, 1, 16);
 
   if (gl_time - gl_lastRefresh >= refreshTime) {
     display.clearDisplay();
@@ -477,8 +464,8 @@ void drawMatrix(int sp, int sz) {
     gl_refresh = false;
   }
 
-  if(!gl_refresh){
-     display.ssd1306_command(SSD1306_SETSTARTLINE | (64 - int(gl_time/100.) % 64));
+  if (!gl_refresh) {
+    display.ssd1306_command(SSD1306_SETSTARTLINE | (64 - int(gl_time / 100.) % 64));
   }
 
   for (int x = 0; x < display.width(); x += 8) {
@@ -501,11 +488,11 @@ void drawMatrix(int sp, int sz) {
 //-------------------------------------------------------------
 //6 - > NOISY CIRCLES
 //-------------------------------------------------------------
-void drawNoisyCircles(int sp, int sz) {
+void drawNoisyCircles(int spd, int dns) {
   gl_refresh = true;
 
-  float timeFactor = map(sp, 1, SPEEDMAX, 1000., 10.);
-  float sizeFactor = map(sz, 1, SIZEMAX, 1, 16);
+  float timeFactor = map(spd, 1, SPEEDMAX, 1000., 10.);
+  float sizeFactor = map(dns, 1, DENSEMAX, 1, 16);
 
   for (int num = 0; num < 8; num ++) {
     float lastx = -999;
@@ -590,12 +577,12 @@ void drawStrobes() {
 //-------------------------------------------------------------
 void drawSimplexNoise() {
   gl_refresh = true;
-  
+
   for (int x = 0; x < display.width(); x += 2) {
     for (int y = 0; y < display.width(); y += 2) {
-      int r = inoise8(x * gl_time/10., y * gl_time/100.);
+      int r = inoise8(x * gl_time / 10., y * gl_time / 100.);
       r = map(r, -70, 70, 0, 255);
-//      Serial.println(r);
+      //      Serial.println(r);
       if (r > 300) {
         display.drawPixel(x, y, SSD1306_WHITE);
       } else {
