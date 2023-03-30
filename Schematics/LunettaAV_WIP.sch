@@ -14489,7 +14489,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="C9" library="SparkFun-Capacitors" deviceset="10UF-POLAR" device="-RADIAL-2.5MM-25V-20%" value="10uF"/>
 <part name="C10" library="SparkFun-Capacitors" deviceset="10UF-POLAR" device="-RADIAL-2.5MM-25V-20%" value="10uF"/>
 <part name="J1" library="SparkFun-Connectors" deviceset="POWER_JACK" device="POWER_JACK_SLOT" value=""/>
-<part name="C7" library="SparkFun-Capacitors" deviceset="10UF-POLAR" device="-RADIAL-2.5MM-25V-20%" value="10uF"/>
+<part name="C7" library="SparkFun-Capacitors" deviceset="100UF-POLAR" device="-RADIAL-2.5MM-25V-20%" value="100uF"/>
 <part name="R30" library="MusicThingModular" deviceset="RESISTOR" device="7MM" value="2.2k"/>
 <part name="MIX" library="MusicThingModular" deviceset="9MM_SNAP-IN_POT" device="_" value="100k"/>
 <part name="OL96$1" library="tft_1_8_1_44_oled_0_96" deviceset="OLED_0.96_I2C" device=""/>
