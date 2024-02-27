@@ -201,13 +201,15 @@ void loop() {
       drawPulsarBalls(_speed, _density);
       break;
     case 5:
-      drawMatrix(_speed, _density);
+      //drawMatrix(_speed, _density);
+      drawCircleLines(_speed, _density);
       break;
     case 6:
       drawNoisyCircles(_speed, _density);
       break;
     case 7:
-      drawSimplexNoise();
+//      drawSimplexNoise();
+      drawMovingLines(_speed, _density);
       break;
   }
 
@@ -290,6 +292,7 @@ void drawGrowingCircles(int spd, int dns) {
   gl_refresh = true;
   float increment = float(spd) / float(SPEEDMAX) * 10.;
   increment = constrain(increment, 1., 10.);
+  
   for (int i = 1; i <= dns; i += 1) {
     display.drawCircle(display.width() / 2, display.height() / 2, i * gl_size / 2, SSD1306_WHITE);
 
@@ -352,11 +355,11 @@ void drawRotatedSquare(int x, int y, float theta) {
 //-------------------------------------------------------------
 void drawWrongLine(int spd, int dns) {
   gl_refresh = true;
-  int step = map(spd, 1, 1000, 63, 1);
+  int step = map(spd, 1, 1000, 64, 1);
   float lastx = -999;
   float lasty = -999;
   float y = display.height() / 2;
-  for (int x = 0; x < display.width() ; x += step) {
+  for (int x = 0; x < display.width() + step ; x += step) {
     y = display.height() / 2 + random(-(dns * 2), (dns * 2));
     if (lastx > -999) {
       display.drawLine(x, y, lastx, lasty, SSD1306_WHITE);
@@ -509,8 +512,19 @@ void drawNoisyCircles(int spd, int dns) {
       float x = display.width() / 2 + radius * cos(radtheta);
       float y = display.height() / 2 + radius * sin(radtheta);
 
-      if (lastx > -999) {
+      float firstx, firsty;
+
+      if(i==0){
+        firstx = x;
+        firsty = y;
+      }
+
+      if (lastx > -999 && i < 360) {
         display.drawLine(x, y, lastx, lasty, SSD1306_WHITE);
+      }
+
+      if(i == 360){
+        display.drawLine(lastx, lasty, firstx, firsty, SSD1306_WHITE);
       }
 
       lastx = x;
@@ -544,6 +558,14 @@ void rotateVec2f(Vec2f &vec, float theta) {
   vec.y = display.height() / 2 + yprime;
 }
 
+//------------------------------------------------------------
+float customNoise(float val){
+  float returnValue = pow(sin(val), 3);
+  return returnValue;
+
+  //This is from Pearson M. Generative Art
+}
+
 //-------------------------------------------------------------
 //-------------------------------------------------------------
 //-------------------------------------------------------------
@@ -551,6 +573,76 @@ void rotateVec2f(Vec2f &vec, float theta) {
 
 
 //SKETCHPAD
+//------------------------------------------------------------
+void drawCircleLines(int spd, int dns){
+  gl_refresh = true;
+
+  float inc = map(dns, 1, DENSEMAX, 10, 1);
+  float jitterC = map(spd, 1, SPEEDMAX, 1, 12);
+
+  int signx = random(100);
+  
+  if (signx < 50){
+    signx = -1;
+  } else {
+    signx = 1;
+  }
+
+  int signy = random(100);
+  
+  if (signy < 50){
+    signy = -1;
+  } else {
+    signy = 1;
+  }
+
+  for(int angle=0; angle<360; angle+=inc * 6){
+
+    float radtheta = angle * PI / 180.;
+    
+    float cx = display.width()/2 + random(jitterC) * signx;
+    float cy = display.height()/2 + random(jitterC) * signy;
+
+    float speedMultiplier = map(spd, 1, SPEEDMAX, 0.1, 1.0);
+
+    float constantr = map(spd, 1, SPEEDMAX, 8, 32);
+    float randomr = 32 - constantr;
+
+    float radius = constantr + random(randomr);
+
+    float angleOffset = gl_time*speedMultiplier;
+    
+    float px = cx + (radius * cos(radtheta + angleOffset));
+    float py = cy + (radius * sin(radtheta + angleOffset));
+
+    display.drawLine(cx, cy, px, py, SSD1306_WHITE);
+  }
+  
+}
+
+//------------------------------------------------------------
+void drawMovingLines(int spd, int dns){
+  gl_refresh = true;
+  
+  int maxLines = map(dns, 1, DENSEMAX, 1, 6);
+
+  float speedFactor = map(spd, 1, SPEEDMAX, 0.5, 11.);
+
+  float yOffset = int(gl_time * speedFactor) % int(display.height()/maxLines);
+
+  for(int i = 0; i<maxLines; i++){
+    
+    float yPos = i * display.height()/maxLines + yOffset;
+
+    float randomOffset = map(spd, 1, SPEEDMAX, 1, display.width()/2);
+      
+    float xOffset = random(randomOffset);
+    
+    display.drawLine(xOffset, yPos, display.width() - xOffset, yPos, SSD1306_WHITE);
+  }
+  
+}
+
 
 //------------------------------------------------------------
 

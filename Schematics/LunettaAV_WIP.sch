@@ -14625,6 +14625,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <sheet>
 <plain>
 <text x="187.96" y="5.08" size="1.778" layer="91">Use jumper to select clock rate</text>
+<text x="185.42" y="-71.12" size="1.778" layer="91">Sourya Sen</text>
 </plain>
 <instances>
 <instance part="B1" gate="G$1" x="-53.34" y="101.6" smashed="yes">
@@ -15746,6 +15747,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 </sheet>
 <sheet>
 <plain>
+<text x="332.74" y="-325.12" size="1.778" layer="91">Sourya Sen</text>
 </plain>
 <instances>
 <instance part="4094" gate="A" x="116.84" y="-106.68" smashed="yes">
