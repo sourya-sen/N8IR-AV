@@ -89,8 +89,8 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 20);
   display.println(F("N8IRAV"));
-  display.println(F("v0.0.2"));
-  display.println(F("Sourya Sen 2023"));
+  display.println(F("v0.0.3"));
+  display.println(F("Sourya Sen 2024"));
   display.display();
 
   delay(500); // Pause for half a second
