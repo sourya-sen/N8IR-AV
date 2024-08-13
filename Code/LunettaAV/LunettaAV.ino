@@ -93,7 +93,7 @@ void setup() {
   display.println(F("Sourya Sen 2024"));
   display.display();
 
-  delay(500); // Pause for half a second
+  delay(1000); // Pause for a second
 
   // Clear the buffer
   display.clearDisplay();
