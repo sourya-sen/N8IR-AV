@@ -15051,6 +15051,12 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="-78.74" y1="40.64" x2="-78.74" y2="33.02" width="0.1524" layer="91"/>
 <label x="-78.74" y="33.02" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="4040" gate="A" pin="RES"/>
+<wire x1="114.3" y1="-7.62" x2="111.76" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="111.76" y1="-7.62" x2="111.76" y2="-20.32" width="0.1524" layer="91"/>
+<label x="111.76" y="-20.32" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="SCL" class="2">
 <segment>
