@@ -1,11 +1,3 @@
-WIP Audiovisual Synthesizer and phrase generator.
-In early prototype stages, check back later for more info!
+The N8IR is a standalone experimental audiovisual synthesizer and phrase generator. Designed with a simple set of interconnected audio and visual controls and a modular patchbay, the N8IR creates tightly synced audiovisual patterns, powered by a Teensy microcontroller and CMOS logic chips.
 
-26.09.2024 TODOs:
-<br>
-Write manuals and documentation!
-<br>
-Fix Readme lol.
-<br>
-
-![Work in progress](Etc/IMG_3140.jpg?raw=true "Work in progress!")
+Detailed manual and documentation to follow.
