@@ -6,6 +6,6 @@ Detailed manual and documentation to follow.
 
 This project would not be possible without the knowledge shared on the electro-music forums and previous work by Andy Murkin.
 
-More on Lunetta Synthesis: https://hackaday.com/series_of_posts/logic-noise/
-The Melody Generator Circuit on the electro-music forums: https://electro-music.com/forum/topic-42552.html
-Andy Murkin’s delay circuit: https://andymurkin.wordpress.com/2018/03/19/piezos-electrets-pt-4-electronics-and-a-very-very-simple-pt2399-echo-delay/
+More on Lunetta Synthesis: https://hackaday.com/series_of_posts/logic-noise/ <br>
+The Melody Generator Circuit on the electro-music forums: https://electro-music.com/forum/topic-42552.html<br>
+Andy Murkin’s delay circuit: https://andymurkin.wordpress.com/2018/03/19/piezos-electrets-pt-4-electronics-and-a-very-very-simple-pt2399-echo-delay/<br>
