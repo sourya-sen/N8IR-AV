@@ -2,4 +2,4 @@ The N8IR is a standalone experimental audiovisual synthesizer and phrase generat
 
 Detailed manual and documentation to follow.
 
-![N8IR](/Etc/Still 2024-09-27 154623_3.1.1.jpg?raw="true" "N8IR")
+![N8IR](/Etc/N8IRThumb.jpg?raw="true" "N8IR")
